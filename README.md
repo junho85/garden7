@@ -17,5 +17,6 @@ python manage.py runserver
 자세한 내용은 [docs](docs)의 내용을 참고합니다.
 
 ## 참고
+* [garden6 github](https://github.com/junho85/garden6)
 * [garden5 github](https://github.com/junho85/garden5)
 * [garden4 github](https://github.com/junho85/garden4)

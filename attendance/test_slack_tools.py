@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from attendance.slack_tools import SlackTools
 from attendance.config_tools import ConfigTools
-
+import re
 
 class TestSlackTools(TestCase):
     slack_tools = SlackTools()
@@ -35,3 +35,35 @@ class TestSlackTools(TestCase):
         print(set(self.config_tools.get_user_slacknames())
               - set(self.slack_tools.get_user_names())
               )
+
+    '''
+    자기소개 방에 있는 유저들의 github 주소를 기준으로 slack name 구하기
+    '''
+    def test_get_users(self):
+        p = re.compile('/github.com/(.*)/')
+
+        # 자기소개방에서 github 주소가 있는 글 추출
+        response = self.slack_tools.get_slack_client().conversations_history(
+            channel="C02MA9HUSV9"
+        )
+
+        for message in response["messages"]:
+            if "github.com" in message["text"]:
+                github_id = p.findall(message["text"])[0]
+                github_id = github_id.split("/")[0]
+                # print(message["user"])
+                response2 = self.slack_tools.get_slack_client().users_info(
+                    user=message["user"]
+                )
+                print(github_id + ":")
+                print("  slack: " + response2["user"]["name"])
+                # print(message["text"])
+
+    '''
+    channel list 구하기.
+     - 자기소개 channel id: C02MA9HUSV9
+     - commit channel id: C02N0D83A3A
+    '''
+    def test_get_channels(self):
+        result = self.slack_tools.get_slack_client().conversations_list()
+        print(result)
