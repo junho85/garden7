@@ -2,7 +2,7 @@ import configparser
 from datetime import date, timedelta, datetime
 import slack
 import os
-
+import re
 
 class SlackTools:
     def __init__(self):
@@ -38,6 +38,28 @@ class SlackTools:
 
     def get_user_names(self):
         return [user["name"] for user in self.get_users()["members"]]
+
+    def get_messages(self):
+        today = datetime.today()
+        yesterday = today - timedelta(days=1)
+        tomorrow = today + timedelta(days=1)
+
+        oldest = yesterday.timestamp()
+        latest = tomorrow.timestamp()
+
+        response = self.slack_client.conversations_history(
+            channel=self.channel_id,
+            latest=str(latest),
+            oldest=str(oldest),
+            count=1000
+        )
+
+        return response
+
+    def get_author_name_from_commit_message(self, message):
+        p = re.compile("by (.*)")
+        github_id = p.findall(message)[0]
+        return github_id
 
     def test_slack(self):
         # self.slack_client.chat_postMessage(

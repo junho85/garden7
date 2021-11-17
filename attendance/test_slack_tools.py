@@ -67,3 +67,21 @@ class TestSlackTools(TestCase):
     def test_get_channels(self):
         result = self.slack_tools.get_slack_client().conversations_list()
         print(result)
+
+    def test_get_commit_messages(self):
+        response = self.slack_tools.get_slack_client().conversations_history(
+            channel="C02N0D83A3A",
+            count=2
+        )
+
+        for message in response["messages"]:
+            print(message)
+        # print(response)
+
+    def test_get_commit_messages2(self):
+        response = self.slack_tools.get_messages()
+        print(response)
+
+    def test_get_author_name_from_commit_message(self):
+        github_id = self.slack_tools.get_author_name_from_commit_message("[junho85/TIL] 2 new commits pushed  to _master_ by junho85")
+        print(github_id)

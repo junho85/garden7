@@ -62,7 +62,7 @@ class Garden:
         result = {}
 
         start_date = self.start_date
-        for message in mongo_collection.find({"attachments.author_name": user}).sort("ts", 1):
+        for message in mongo_collection.find({"author_name": user}).sort("ts", 1):
             # make attend
             commits = []
             for attachment in message["attachments"]:
@@ -103,7 +103,6 @@ class Garden:
 
     # github 봇으로 모은 slack message 들을 slack_messages collection 에 저장
     def collect_slack_messages(self, oldest, latest):
-
         response = self.slack_client.conversations_history(
             channel=self.channel_id,
             latest=str(latest),
@@ -114,8 +113,18 @@ class Garden:
         mongo_collection = self.mongo_tools.get_collection()
 
         for message in response["messages"]:
-            message["ts_for_db"] = datetime.fromtimestamp(float(message["ts"]))
+            if "attachments" not in message:
+                continue
+
             # pprint.pprint(message)
+            message["ts_for_db"] = datetime.fromtimestamp(float(message["ts"]))
+            try:
+                message["author_name"] = self.slack_tools.get_author_name_from_commit_message(message["attachments"][0]["fallback"])
+            except Exception as err:
+                print(message["attachments"])
+                print(err)
+                continue
+            # print(message["author_name"])
 
             try:
                 mongo_collection.insert_one(message)

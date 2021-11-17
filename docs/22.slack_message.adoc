@@ -1,12 +1,55 @@
-## slack_messages
+= slack_messages
+
+== message
+
+messages 리스트로 오는데 그 중 하나 추출 예제
+----
+{
+	'bot_id': 'B02MC36L1PU',
+	'type': 'message',
+	'text': '',
+	'user': 'U02LXDBJZRV',
+	'ts': '1637159014.020800',
+	'team': 'T02M3GHM1L6',
+	'bot_profile': {
+		'id': 'B02MC36L1PU',
+		'deleted': False,
+		'name': 'GitHub',
+		'updated': 1636984097,
+		'app_id': 'A01BP7R4KNY',
+		'icons': {
+			'image_36': 'https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_36.png',
+			'image_48': 'https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_48.png',
+			'image_72': 'https://avatars.slack-edge.com/2020-11-25/1527503386626_319578f21381f9641cd8_72.png'
+		},
+		'team_id': 'T02M3GHM1L6'
+	},
+	'attachments': [{
+		'fallback': '[junho85/TIL] 1 new commit pushed  to _master_ by junho85',
+		'text': '`<https://github.com/junho85/TIL/commit/a706a7a012ae4cd568fb0b225c826bb0fc1ef725|a706a7a0>` - 정원사들 시즌7 설치 문서 정리 중\n',
+		'pretext': '<https://github.com/junho85/TIL/compare/5ae9faa91fc4...a706a7a012ae|1 new commit> pushed  to `<https://github.com/junho85/TIL/tree/master|master>` by <https://github.com/junho85|junho85>',
+		'footer': '<https://github.com/junho85/TIL|junho85/TIL>',
+		'id': 1,
+		'footer_icon': 'https://slack.github.com/static/img/favicon-neutral.png',
+		'color': '24292f',
+		'mrkdwn_in': ['text']
+	}]
+}
+----
+
+== 예전 내용 참고용
 * save all slack messages from #commit channel
-```
+
+[source]
+----
 {ts, attachments, bot_id, bot_profile, team, text, ts, type, user}
-```
+----
 
 slack_messages 에 저장된 데이터 예. mongodb 에 넣으면서 _id 가 자동 추가 됩니다.
 날짜 range 로 검색을 편리하게 하기위해 ts 는 ts_for_db 라는 timestamp type 으로 변경해서 넣습니다.
-```
+
+[source]
+----
 {
 	'_id': ObjectId('5db5a705f7cf4f12ad0d8c1b'),
 	'bot_id': 'BNGD110UR',
@@ -42,5 +85,5 @@ slack_messages 에 저장된 데이터 예. mongodb 에 넣으면서 _id 가 자
 		'mrkdwn_in': ['text']
 	}]
 }
-```
+----
 ts_for_db
