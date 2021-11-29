@@ -10,4 +10,9 @@ tomorrow = today + timedelta(days=1)
 oldest = yesterday.timestamp()
 latest = tomorrow.timestamp()
 
-garden.collect_slack_messages(oldest, latest)
+try:
+    garden.collect_slack_messages(oldest, latest)
+except Exception as err:
+    garden.send_error_message("[모니터링] 출석부 수집 에러발생!\n" + str(err))
+    raise err
+

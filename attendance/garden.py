@@ -184,3 +184,9 @@ class Garden:
             link_names=1
         )
 
+    def send_error_message(self, message):
+        self.slack_client.chat_postMessage(
+            channel='C02NF5TD487', # TODO config
+            text=message
+        )
+

@@ -68,6 +68,9 @@ class TestSlackTools(TestCase):
         result = self.slack_tools.get_slack_client().conversations_list()
         print(result)
 
+        for channel in result["channels"]:
+            print(channel["id"] + ":" + channel["name"])
+
     def test_get_commit_messages(self):
         response = self.slack_tools.get_slack_client().conversations_history(
             channel="C02N0D83A3A",
