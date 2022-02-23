@@ -109,11 +109,11 @@ commit_urls = [
     # 'https://github.com/lumiamitie/TIL/commit/c6169c3a7f1121e4d51815727cc8c8e51327ccd0', # 11.15
     # 최준우
     # 'https://github.com/mike6321/TIL/commit/53dee824e2a87c6131d6fbca813593096bfcbaf5', # 11.15
-    'https://github.com/mike6321/TIL/commit/e3edbe45aa30b5174b2794e58953a4872f09bde8', # (16일)
-    'https://github.com/mike6321/TIL/commit/c42b813ba927a1bd4e96aeda74f2874fa88b47d2', # (17일)
-    'https://github.com/mike6321/TIL/commit/6a1e1e146e0762e9cff0622172e9e9b720e7da45', # (18일)
-    'https://github.com/mike6321/TIL/commit/108081254525a7e37835b2cfa52d67e5ff4de268', # (19일)
-    'https://github.com/mike6321/TIL/commit/9e33b27b3c052654040753e2f249ef25dc65163d', # (20일)
+    # 'https://github.com/mike6321/TIL/commit/e3edbe45aa30b5174b2794e58953a4872f09bde8', # (16일)
+    # 'https://github.com/mike6321/TIL/commit/c42b813ba927a1bd4e96aeda74f2874fa88b47d2', # (17일)
+    # 'https://github.com/mike6321/TIL/commit/6a1e1e146e0762e9cff0622172e9e9b720e7da45', # (18일)
+    # 'https://github.com/mike6321/TIL/commit/108081254525a7e37835b2cfa52d67e5ff4de268', # (19일)
+    # 'https://github.com/mike6321/TIL/commit/9e33b27b3c052654040753e2f249ef25dc65163d', # (20일)
     # 지나
     # 'https://github.com/koyrkr/TIL/commit/47c2f18728af3e0cc6935d079ad2383e6f388cd7',  # 11.15 - 11.16 00:57
     # 김도담
@@ -121,6 +121,7 @@ commit_urls = [
     # codingbowoo
     # 고언약
     # 'https://github.com/brave-people/Dev-Event/commit/3e4fe876c29e9cd386c06f604cdcce7aec1dcef6', # 11.15 repo가 다르지만 처음이라 인정. author_name 수작업 필요
+    'https://github.com/KoEonYack/0x01/commit/38e82a4eb736da7a146529ca07588fc86d343593', # 02.22
     # estellechoi
     # DS-DavGu
     # bloomspes
