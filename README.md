@@ -6,14 +6,26 @@
 * [wiki](https://github.com/junho85/garden7/wiki)
 
 ## project
+start mongodb
 ```
 docker start mymongo
 ```
 
+activate virtual env
 ```
 source venv/bin/activate
+```
+
+install packages
+```
+pip install -r requirements.txt
+```
+
+run server
+```
 python manage.py runserver
 ```
+
 자세한 내용은 [docs](docs)의 내용을 참고합니다.
 
 ## 참고
