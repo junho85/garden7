@@ -102,8 +102,10 @@ function draw_commits(attendances) {
     $.each(attendances, function(idx, attendance) {
         html += `<h4>${attendance.date}</h4>`;
         $.each(attendance.commits, function(idx, commit) {
-            commit.message[0] = commit.message[0].replace(/(?:\r\n|\r|\n)/g, '<br>');
-            html += `${commit.message[0]}`;
+            // commit.message[0]은 이미 서버에서 HTML로 변환됨
+            // 추가적인 줄바꿈 처리만 수행
+            let processedMessage = commit.message[0].replace(/(?:\r\n|\r|\n)/g, '<br>');
+            html += `${processedMessage}`;
         })
     });
     $("#commits").html(html);

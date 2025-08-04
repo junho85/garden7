@@ -5,24 +5,38 @@
 * [github](https://github.com/junho85/garden7)
 * [wiki](https://github.com/junho85/garden7/wiki)
 
+## Requirements
+* Python 3.11.11
+* MongoDB
+
 ## project
-start mongodb
+
+### Python 환경 설정
+Python 3.11.11 설치 (macOS)
+```
+brew install python@3.11
+```
+
+가상환경 생성 및 활성화
+```
+python3.11 -m venv venv
+source venv/bin/activate
+```
+
+패키지 설치
+```
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### MongoDB 시작
 ```
 docker start mymongo
 ```
 
-activate virtual env
+### 개발 서버 실행
 ```
-source venv/bin/activate
-```
-
-install packages
-```
-pip install -r requirements.txt
-```
-
-run server
-```
+python manage.py migrate
 python manage.py runserver
 ```
 
