@@ -1,0 +1,20 @@
+; config.ini.sample
+; Copy this file to config.ini and fill in your actual values
+[DEFAULT]
+SLACK_API_TOKEN = xoxb-your-slack-api-token-here
+CHANNEL_ID = C02N0D83A3A
+
+START_DATE = 2021-11-15
+GARDENING_DAYS = 100
+
+[DATABASE]
+TYPE = postgresql
+HOST = aws-0-ap-northeast-2.pooler.supabase.com
+PORT = 6543
+DATABASE = postgres
+USER = postgres.schejihwxwsvaduhpkbe
+PASSWORD = your-password
+SCHEMA = garden7
+
+[MONITOR]
+CHANNEL_ID = C02NF5TD487
