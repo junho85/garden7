@@ -1,8 +1,8 @@
 from datetime import date, timedelta, datetime
-import pymongo
 import pprint
+import json
 from attendance.slack_tools import SlackTools
-from attendance.mongo_tools import MongoTools
+from attendance.postgresql_tools import PostgreSQLTools
 from attendance.config_tools import ConfigTools
 
 
@@ -10,7 +10,7 @@ class Garden:
     def __init__(self):
         self.config_tools = ConfigTools()
         self.slack_tools = SlackTools()
-        self.mongo_tools = MongoTools()
+        self.db_tools = PostgreSQLTools()
 
         self.slack_client = self.slack_tools.get_slack_client()
         self.channel_id = self.slack_tools.get_channel_id()
@@ -47,25 +47,46 @@ class Garden:
         print(latest)
         print(datetime.fromtimestamp(latest))
 
-        mongo_collection = self.mongo_tools.get_collection()
-
-        for message in mongo_collection.find(
-                {"ts_for_db": {"$gte": datetime.fromtimestamp(oldest), "$lt": datetime.fromtimestamp(latest)}}):
+        query = """
+            SELECT ts, ts_for_db, attachments
+            FROM slack_messages
+            WHERE ts_for_db >= %s AND ts_for_db < %s
+            ORDER BY ts_for_db
+        """
+        
+        messages = self.db_tools.execute_query(query, (datetime.fromtimestamp(oldest), datetime.fromtimestamp(latest)))
+        
+        for message in messages:
             print(message["ts"])
             print(message)
 
     # 특정 유저의 전체 출석부를 생성함
     # TODO 출석부를 DB에 넣고 마지막 생성된 출석부 이후의 데이터로 추가 출석부 만들도록 하자
     def find_attendance_by_user(self, user):
-        mongo_collection = self.mongo_tools.get_collection()
-
+        # fallback 필드에서 author name을 추출하여 사용자별 데이터를 조회
+        # commit 메시지만 필터링 (Pull Request 등 제외)
+        query = """
+            SELECT ts, ts_for_db, attachments
+            FROM slack_messages
+            WHERE attachments->0->>'fallback' LIKE %s
+            AND attachments->0->>'text' IS NOT NULL
+            AND attachments->0->>'text' != ''
+            ORDER BY ts
+        """
+        
+        # "by {user}" 패턴으로 검색
+        search_pattern = f"% by {user}"
+        messages = self.db_tools.execute_query(query, (search_pattern,))
+        
         result = {}
-
         start_date = self.start_date
-        for message in mongo_collection.find({"author_name": user}).sort("ts", 1):
+        
+        for message in messages:
             # make attend
             commits = []
-            for attachment in message["attachments"]:
+            # PostgreSQL에서 JSONB로 가져온 attachments 처리
+            attachments = message["attachments"] if message["attachments"] else []
+            for attachment in attachments:
                 try:
                     # commit has text field
                     # there is no text field in pull request, etc...
@@ -79,7 +100,6 @@ class Garden:
             if len(commits) == 0:
                 continue
 
-            # ts_datetime = datetime.fromtimestamp(float(message["ts"]))
             ts_datetime = message["ts_for_db"]
             attend = {"ts": ts_datetime, "message": commits}
 
@@ -101,7 +121,7 @@ class Garden:
 
         return result
 
-    # github 봇으로 모은 slack message 들을 slack_messages collection 에 저장
+    # github 봇으로 모은 slack message 들을 slack_messages 테이블에 저장
     def collect_slack_messages(self, oldest, latest):
         response = self.slack_client.conversations_history(
             channel=self.channel_id,
@@ -110,34 +130,50 @@ class Garden:
             count=1000
         )
 
-        mongo_collection = self.mongo_tools.get_collection()
-
         for message in response["messages"]:
             if "attachments" not in message:
                 continue
 
             # pprint.pprint(message)
-            message["ts_for_db"] = datetime.fromtimestamp(float(message["ts"]))
+            ts_for_db = datetime.fromtimestamp(float(message["ts"]))
+            
             try:
-                message["author_name"] = self.slack_tools.get_author_name_from_commit_message(message["attachments"][0]["fallback"])
+                author_name = self.slack_tools.get_author_name_from_commit_message(message["attachments"][0]["fallback"])
             except Exception as err:
                 print(message["attachments"])
                 print(err)
                 continue
-            # print(message["author_name"])
-
+            
+            # PostgreSQL에 메시지 삽입
+            insert_query = """
+                INSERT INTO slack_messages 
+                (ts, ts_for_db, bot_id, type, text, "user", team, bot_profile, attachments)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (ts) DO NOTHING
+            """
+            
             try:
-                mongo_collection.insert_one(message)
-            except pymongo.errors.DuplicateKeyError as err:
-                print(err)
+                self.db_tools.execute_insert(insert_query, (
+                    message["ts"],
+                    ts_for_db,
+                    message.get("bot_id"),
+                    message.get("type"),
+                    message.get("text"),
+                    message.get("user"),
+                    message.get("team"),
+                    json.dumps(message.get("bot_profile")) if message.get("bot_profile") else None,
+                    json.dumps(message.get("attachments")) if message.get("attachments") else None
+                ))
+            except Exception as err:
+                print(f"Insert error: {err}")
                 continue
 
     """
     db 에 수집한 slack 메시지 삭제
     """
     def remove_all_slack_messages(self):
-        mongo_collection = self.mongo_tools.get_collection()
-        mongo_collection.remove()
+        delete_query = "DELETE FROM slack_messages"
+        self.db_tools.execute_insert(delete_query)
 
     """
     특정일의 출석 데이터 불러오기
@@ -189,4 +225,3 @@ class Garden:
             channel=self.config_tools.get_monitor_channel_id(),
             text=message
         )
-

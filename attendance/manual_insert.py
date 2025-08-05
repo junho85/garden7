@@ -1,19 +1,16 @@
 from datetime import datetime
+import json
 
 from garden import Garden
-
-from attendance.mongo_tools import MongoTools
+from attendance.postgresql_tools import PostgreSQLTools
 
 import pprint
 import requests
 
 from urllib.parse import urlparse
 
-mongo_tools = MongoTools()
-
+db_tools = PostgreSQLTools()
 garden = Garden()
-
-mongo_collection = mongo_tools.get_collection()
 
 def get_commit(commit_url):
     parse_result = urlparse(commit_url)
@@ -73,12 +70,29 @@ def manual_insert(commit_url):
     pprint.pprint(message)
     # exit(-1)
 
+    # PostgreSQL에 메시지 삽입
+    insert_query = """
+        INSERT INTO slack_messages 
+        (ts, ts_for_db, bot_id, type, text, "user", team, bot_profile, attachments)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (ts) DO NOTHING
+    """
+    
     try:
-        result = mongo_collection.insert_one(message)
-        pprint.pprint(result)
-        print(message)
+        db_tools.execute_insert(insert_query, (
+            message["ts"],
+            message["ts_for_db"],
+            message.get("bot_id"),
+            message.get("type"),
+            message.get("text"),
+            message.get("user"),
+            message.get("team"),
+            json.dumps(message.get("bot_profile")) if message.get("bot_profile") else None,
+            json.dumps(message.get("attachments")) if message.get("attachments") else None
+        ))
+        print(f"Successfully inserted message with ts: {message['ts']}")
     except Exception as e:
-        print(e)
+        print(f"Insert error: {e}")
 
 commit_urls = [
     # 오스카

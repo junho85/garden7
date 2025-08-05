@@ -1,14 +1,16 @@
 # Core dependencies
 Django>=4.2,<5.0
-pymongo>=4.0.0
+psycopg2-binary>=2.9.0
 slackclient==2.9.4
 PyYAML>=6.0
 Markdown>=3.4.0
 requests>=2.28.0
 
+# Note: Migrated from MongoDB to PostgreSQL (Supabase)
+# pymongo>=4.0.0  # Removed - no longer using MongoDB
+
 # Note: python-markdown-slack requires markdown==2.6.6 which is incompatible with Python 3.11
 # Temporarily removed and implemented alternative solution
 
 # Optional: Add these if needed based on your project
-# psycopg2-binary>=2.9.0  # For PostgreSQL
 # gunicorn>=20.1.0        # For production deployment
